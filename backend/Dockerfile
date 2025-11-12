@@ -1,27 +1,23 @@
-FROM mcr.microsoft.com/azure-functions/python:4-python3.11
+FROM python:3.11-slim
 
-ENV AzureWebJobsScriptRoot=/home/site/wwwroot \
-    AzureFunctionsJobHost__Logging__Console__IsEnabled=true
+# Set working directory
+WORKDIR /app
 
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
-    curl \
-    gnupg \
-    && curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg \
-    && mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg \
-    && sh -c 'echo "deb [arch=amd64,arm64,armhf] https://packages.microsoft.com/debian/11/prod bullseye main" > /etc/apt/sources.list.d/dotnetdev.list' \
-    && apt-get update \
-    && apt-get install -y azure-functions-core-tools-4 \
     && rm -rf /var/lib/apt/lists/*
 
+# Copy requirements and install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . /home/site/wwwroot
+# Copy application code
+COPY . .
 
-WORKDIR /home/site/wwwroot
+# Expose port
+EXPOSE 8000
 
-EXPOSE 80
-
-CMD ["func", "start", "--host", "0.0.0.0", "--port", "80"]
+# Run Gunicorn
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--timeout", "600", "--workers", "2", "--threads", "4", "app:app"]
 

@@ -9,10 +9,16 @@ venv/
 ENV/
 .venv
 
-# Azure Functions
-api/local.settings.json
-api/.python_packages/
-api/__pycache__/
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Azure Functions (legacy - not used anymore)
+# api/local.settings.json
+# api/.python_packages/
 
 # Node
 node_modules/

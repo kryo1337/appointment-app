@@ -58,7 +58,7 @@ const SlotFinder = ({ onSlotSelect }) => {
       setLoading(true);
       setError(null);
       const response = await slotsAPI.find(selectedPersonIds, date, durationMinutes);
-      const foundSlots = response.data.slots || [];
+      const foundSlots = Array.isArray(response.data) ? response.data : (response.data.slots || []);
       console.log(`SlotFinder: Found ${foundSlots.length} slots`, foundSlots);
       setSlots(foundSlots);
       
